@@ -24,7 +24,7 @@ namespace CombatEssentials.Domain.Entities
 
         [Required, Column(TypeName = "decimal(18,2)")]
         public decimal UnitPrice { get; set; }
-        [Required]
+        [Required, Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
         // Navigation
