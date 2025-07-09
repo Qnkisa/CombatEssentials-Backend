@@ -41,7 +41,9 @@ namespace CombatEssentials.API
                 });
             });
 
+            // Registering services
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
 
             // Add DbContext with SQL Server
             builder.Services.AddDbContext<ApplicationDbContext>(options =>

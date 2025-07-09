@@ -25,9 +25,11 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Controllers\" />
+    <Folder Include="wwwroot\images\products\" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CombatEssentials.Application\CombatEssentials.Application.csproj" />
     <ProjectReference Include="..\CombatEssentials.Infrastructure\CombatEssentials.Infrastructure.csproj" />
   </ItemGroup>
 
