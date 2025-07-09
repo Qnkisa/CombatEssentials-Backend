@@ -1,3 +1,5 @@
+using CombatEssentials.Application.Interfaces;
+using CombatEssentials.Application.Services;
 using CombatEssentials.Domain.Entities;
 using CombatEssentials.Infrastructure.Data;
 using CombatEssentials.Infrastructure.Data.Seed;
@@ -38,6 +40,8 @@ namespace CombatEssentials.API
                     { securityScheme, new[] { "Bearer" } }
                 });
             });
+
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             // Add DbContext with SQL Server
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
