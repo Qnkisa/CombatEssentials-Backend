@@ -46,7 +46,8 @@ namespace CombatEssentials.API
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IWishlistService, WishlistService>();
             builder.Services.AddScoped<ICartService, CartService>();
-            builder.Services.AddScoped<IReviewService, ReviewService>();
+            builder.Services.AddScoped<IReviewService, ReviewService>();    
+            builder.Services.AddScoped<IOrderService, OrderService>();
 
             // Add DbContext with SQL Server
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
