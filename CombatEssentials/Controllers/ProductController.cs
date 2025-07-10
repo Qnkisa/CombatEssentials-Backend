@@ -17,9 +17,11 @@ namespace CombatEssentials.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1)
         {
-            var products = await _service.GetAllAsync();
+            if (page < 1) return BadRequest("Page number must be 1 or greater.");
+
+            var products = await _service.GetAllAsync(page);
             return Ok(products);
         }
 

@@ -24,10 +24,15 @@ namespace CombatEssentials.Application.Services
             _env = env;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync()
+        public async Task<IEnumerable<ProductDto>> GetAllAsync(int page)
         {
+            const int pageSize = 15;
+
             return await _context.Products
                 .Include(p => p.Category)
+                .OrderBy(p => p.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(p => new ProductDto
                 {
                     Id = p.Id,
