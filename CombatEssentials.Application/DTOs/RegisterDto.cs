@@ -18,7 +18,7 @@ namespace CombatEssentials.Application.DTOs
         [Required, EmailAddress]
         public string Email { get; set; }
 
-        [Required, MinLength(6)]
+        [Required]
         public string Password { get; set; }
 
         [Required]

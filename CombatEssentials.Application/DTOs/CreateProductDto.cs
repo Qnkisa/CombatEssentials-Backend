@@ -4,16 +4,17 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CombatEssentials.Domain.Validations;
 using Microsoft.AspNetCore.Http;
 
 namespace CombatEssentials.Application.DTOs
 {
     public class CreateProductDto
     {
-        [Required, MaxLength(200)]
+        [Required, MaxLength(ProductValidations.NameMaxLength)]
         public string Name { get; set; } = string.Empty;
 
-        [MaxLength(1000)]
+        [MaxLength(ProductValidations.DescriptionMaxLength)]
         public string Description { get; set; } = string.Empty;
 
         [Required]
