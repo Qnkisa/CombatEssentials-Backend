@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using CombatEssentials.Domain.Validations;
 using Microsoft.AspNetCore.Http;
 
-namespace CombatEssentials.Application.DTOs
+namespace CombatEssentials.Application.DTOs.ProductDtos
 {
-    public class CreateProductDto
+    public class UpdateProductDto
     {
         [Required, MaxLength(ProductValidations.NameMaxLength)]
         public string Name { get; set; } = string.Empty;
@@ -23,7 +23,6 @@ namespace CombatEssentials.Application.DTOs
         [Required]
         public int CategoryId { get; set; }
 
-        [Required]
-        public IFormFile ImageFile { get; set; } = null!;
+        public IFormFile ImageFile { get; set; }
     }
 }

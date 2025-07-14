@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CombatEssentials.Application.DTOs
+namespace CombatEssentials.Application.DTOs.CartDtos
 {
-    public class ReviewDto
+    public class CartItemDto
     {
         public int ProductId { get; set; }
-        public int Rating { get; set; }
-        public string Comment { get; set; }
+        public int Quantity { get; set; }
     }
 }

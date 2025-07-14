@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CombatEssentials.Application.DTOs
+namespace CombatEssentials.Application.DTOs.ProductDtos
 {
     public class ProductDto
     {

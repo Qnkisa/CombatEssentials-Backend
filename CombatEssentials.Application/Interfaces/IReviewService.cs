@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CombatEssentials.Application.DTOs;
+using CombatEssentials.Application.DTOs.ReviewDtos;
 using CombatEssentials.Domain.Entities;
 
 namespace CombatEssentials.Application.Interfaces
 {
     public interface IReviewService
     {
-        Task<IEnumerable<Review>> GetReviewsForProductAsync(int productId);
+        Task<IEnumerable<GetReviewDto>> GetReviewsForProductAsync(int productId);
         Task AddReviewAsync(string userId, ReviewDto dto);
-        Task DeleteReviewAsync(string userId, int reviewId);
+        Task<(bool Success, string Message)> DeleteReviewAsync(string userId, int reviewId);
     }
 
 }

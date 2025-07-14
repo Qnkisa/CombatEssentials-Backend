@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using CombatEssentials.Application.DTOs;
+using CombatEssentials.Application.DTOs.AuthDtos;
 using CombatEssentials.Application.Interfaces;
 using CombatEssentials.Domain.Entities;
 using CombatEssentials.Domain.Settings;
@@ -48,12 +48,6 @@ namespace CombatEssentials.Application.Services
             if (!result.Succeeded)
                 return string.Join("; ", result.Errors.Select(e => e.Description));
 
-            // Add role
-            if (!await _userManager.IsInRoleAsync(user, dto.Role))
-            {
-                await _userManager.AddToRoleAsync(user, dto.Role);
-            }
-
             return "Registration successful.";
         }
 
@@ -88,11 +82,6 @@ namespace CombatEssentials.Application.Services
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public async Task LogoutAsync()
-        {
-            await _signInManager.SignOutAsync();
         }
     }
 }

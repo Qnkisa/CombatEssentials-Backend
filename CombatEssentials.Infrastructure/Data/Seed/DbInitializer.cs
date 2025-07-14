@@ -66,6 +66,47 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                 await context.SaveChangesAsync();
             }
         }
+
+        public static async Task SeedProductsAsync(ApplicationDbContext context)
+        {
+            if (!await context.Products.AnyAsync())
+            {
+                var glovesCategory = await context.Categories.FirstOrDefaultAsync(c => c.Name == "Gloves");
+                var headgearCategory = await context.Categories.FirstOrDefaultAsync(c => c.Name == "Headgear");
+                var apparelCategory = await context.Categories.FirstOrDefaultAsync(c => c.Name == "Apparel");
+
+                var products = new List<Product>
+        {
+            new Product
+            {
+                Name = "Pro Fight Gloves",
+                Description = "Durable leather gloves for professional sparring.",
+                ImageUrl = "/images/products/gloves1.jpg",
+                Price = 89.99m,
+                CategoryId = glovesCategory.Id
+            },
+            new Product
+            {
+                Name = "Headgear Elite",
+                Description = "Maximum protection headgear with breathable padding.",
+                ImageUrl = "/images/products/headgear1.jpg",
+                Price = 74.50m,
+                CategoryId = headgearCategory.Id
+            },
+            new Product
+            {
+                Name = "Combat Essentials Hoodie",
+                Description = "Comfortable hoodie for everyday wear and training.",
+                ImageUrl = "/images/products/apparel1.jpg",
+                Price = 49.90m,
+                CategoryId = apparelCategory.Id
+            }
+        };
+
+                context.Products.AddRange(products);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 
 }

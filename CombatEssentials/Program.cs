@@ -129,6 +129,7 @@ namespace CombatEssentials.API
 
                 await DbInitializer.SeedRolesAndAdminAsync(userManager, roleManager);
                 await DbInitializer.SeedCategoriesAsync(dbContext);
+                await DbInitializer.SeedProductsAsync(dbContext);
             }
 
             // Configure middleware

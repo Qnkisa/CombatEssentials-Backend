@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CombatEssentials.Application.DTOs;
+using CombatEssentials.Application.DTOs.ProductDtos;
 using CombatEssentials.Application.Interfaces;
 using CombatEssentials.Domain.Entities;
 using CombatEssentials.Infrastructure.Data;

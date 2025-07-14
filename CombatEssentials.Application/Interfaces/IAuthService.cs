@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CombatEssentials.Application.DTOs;
+using CombatEssentials.Application.DTOs.AuthDtos;
 
 namespace CombatEssentials.Application.Interfaces
 {
@@ -11,6 +11,5 @@ namespace CombatEssentials.Application.Interfaces
     {
         Task<string> RegisterAsync(RegisterDto dto);
         Task<string> LoginAsync(LoginDto dto);
-        Task LogoutAsync();
     }
 }

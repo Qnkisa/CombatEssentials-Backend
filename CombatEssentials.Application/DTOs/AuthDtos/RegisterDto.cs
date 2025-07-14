@@ -5,10 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CombatEssentials.Application.DTOs
+namespace CombatEssentials.Application.DTOs.AuthDtos
 {
-    public class LoginDto
+    public class RegisterDto
     {
+        [Required]
+        public string FirstName { get; set; }
+
+        [Required]
+        public string LastName { get; set; }
+
         [Required, EmailAddress]
         public string Email { get; set; }
 

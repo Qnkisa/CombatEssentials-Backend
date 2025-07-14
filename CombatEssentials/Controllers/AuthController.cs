@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using CombatEssentials.Application.DTOs;
+using CombatEssentials.Application.DTOs.AuthDtos;
 using CombatEssentials.Application.Interfaces;
 using CombatEssentials.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -39,14 +39,6 @@ namespace CombatEssentials.API.Controllers
                 return Unauthorized(new { message = token });
 
             return Ok(new { token });
-        }
-
-        [HttpPost("logout")]
-        [Authorize]
-        public async Task<IActionResult> Logout()
-        {
-            await _authService.LogoutAsync();
-            return Ok(new { message = "Logged out." });
         }
 
         [Authorize]

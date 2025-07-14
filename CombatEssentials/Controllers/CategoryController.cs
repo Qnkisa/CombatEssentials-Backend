@@ -19,7 +19,7 @@ namespace CombatEssentials.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var categories = await _categoryService.GetAllAsync();
-            return Ok(categories);
+            return Ok(categories); // Returns List<CategoryDto>
         }
 
         // GET: api/Category/5
@@ -28,7 +28,7 @@ namespace CombatEssentials.API.Controllers
         {
             var category = await _categoryService.GetByIdAsync(id);
             if (category == null) return NotFound();
-            return Ok(category);
+            return Ok(category); // Returns CategoryDto
         }
     }
 }

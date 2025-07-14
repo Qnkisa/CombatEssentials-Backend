@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CombatEssentials.Application.DTOs;
+using CombatEssentials.Application.DTOs.ReviewDtos;
 using CombatEssentials.Application.Interfaces;
 using CombatEssentials.Domain.Entities;
 using CombatEssentials.Infrastructure.Data;
@@ -16,11 +16,20 @@ namespace CombatEssentials.Application.Services
         private readonly ApplicationDbContext _context;
         public ReviewService(ApplicationDbContext context) => _context = context;
 
-        public async Task<IEnumerable<Review>> GetReviewsForProductAsync(int productId)
+        public async Task<IEnumerable<GetReviewDto>> GetReviewsForProductAsync(int productId)
         {
             return await _context.Reviews
                 .Where(r => r.ProductId == productId)
                 .Include(r => r.User)
+                .Select(r => new GetReviewDto
+                {
+                    Id = r.Id,
+                    UserId = r.UserId,
+                    UserName = r.User.UserName,
+                    ProductId = r.ProductId,
+                    Rating = r.Rating,
+                    Comment = r.Comment
+                })
                 .ToListAsync();
         }
 
@@ -37,14 +46,19 @@ namespace CombatEssentials.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteReviewAsync(string userId, int reviewId)
+        public async Task<(bool Success, string Message)> DeleteReviewAsync(string userId, int reviewId)
         {
-            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId && r.UserId == userId);
-            if (review != null)
-            {
-                _context.Reviews.Remove(review);
-                await _context.SaveChangesAsync();
-            }
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId);
+
+            if (review == null)
+                return (false, "Review not found.");
+
+            if (review.UserId != userId)
+                return (false, "You are not authorized to delete this review.");
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return (true, "Review deleted successfully.");
         }
     }
 }

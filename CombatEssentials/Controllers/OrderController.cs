@@ -1,4 +1,5 @@
-﻿using CombatEssentials.Application.Interfaces;
+﻿using CombatEssentials.Application.DTOs.OrderDtos;
+using CombatEssentials.Application.Interfaces;
 using CombatEssentials.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,6 @@ namespace CombatEssentials.API.Controllers
             return Ok(orders);
         }
 
-        // GET: api/orders/user
         [HttpGet("user")]
         [Authorize]
         public async Task<IActionResult> GetByUser()
@@ -36,7 +36,6 @@ namespace CombatEssentials.API.Controllers
             return Ok(orders);
         }
 
-        // GET: api/orders/5
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetById(int id)
@@ -46,41 +45,30 @@ namespace CombatEssentials.API.Controllers
             return Ok(order);
         }
 
-        // POST: api/orders
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Create(Order order)
+        public async Task<IActionResult> Create(CreateOrderDto dto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            order.UserId = userId;
-            order.OrderDate = DateTime.UtcNow;
-            order.TotalAmount = order.OrderItems.Sum(i => i.TotalAmount);
-
-            var created = await _orderService.CreateAsync(order);
+            var created = await _orderService.CreateAsync(userId, dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        // PUT: api/orders/5
         [HttpPut("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Update(int id, Order order)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateOrderDto dto)
         {
-            if (id != order.Id) return BadRequest();
-
-            var success = await _orderService.UpdateAsync(order);
+            var success = await _orderService.UpdateAsync(id, dto.ShippingAddress, dto.OrderStatus);
             if (!success) return NotFound();
-
             return NoContent();
         }
 
-        // DELETE: api/orders/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _orderService.DeleteAsync(id);
             if (!success) return NotFound();
-
             return NoContent();
         }
     }

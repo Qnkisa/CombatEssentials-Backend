@@ -1,4 +1,4 @@
-﻿using CombatEssentials.Application.DTOs;
+﻿using CombatEssentials.Application.DTOs.ReviewDtos;
 using CombatEssentials.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,7 @@ namespace CombatEssentials.API.Controllers
 
         // GET: api/review/product/{productId}
         [HttpGet("product/{productId}")]
-        [AllowAnonymous] // Allow guests to view reviews
+        [AllowAnonymous]
         public async Task<IActionResult> GetReviewsForProduct(int productId)
         {
             var reviews = await _reviewService.GetReviewsForProductAsync(productId);
@@ -49,8 +49,24 @@ namespace CombatEssentials.API.Controllers
         public async Task<IActionResult> DeleteReview(int reviewId)
         {
             var userId = GetUserId();
-            await _reviewService.DeleteReviewAsync(userId, reviewId);
-            return Ok(new { message = "Review deleted successfully." });
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "User is not authenticated." });
+
+            var (success, message) = await _reviewService.DeleteReviewAsync(userId, reviewId);
+
+            if (!success)
+            {
+                if (message == "Review not found.")
+                    return NotFound(new { message });
+
+                if (message == "You are not authorized to delete this review.")
+                    return Forbid();
+
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message });
         }
     }
 }

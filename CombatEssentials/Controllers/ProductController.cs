@@ -1,4 +1,4 @@
-﻿using CombatEssentials.Application.DTOs;
+﻿using CombatEssentials.Application.DTOs.ProductDtos;
 using CombatEssentials.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
