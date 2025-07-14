@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CombatEssentials.Domain.Validations;
 
 namespace CombatEssentials.Domain.Entities
 {
@@ -20,10 +21,10 @@ namespace CombatEssentials.Domain.Entities
         [Required]
         public string UserId { get; set; }
 
-        [Required, Range(1, 5)]
+        [Required, Range(ReviewValidations.RatingMinValue, ReviewValidations.RatingMaxValue)]
         public int Rating { get; set; }
 
-        [MaxLength(1000)]
+        [MaxLength(ReviewValidations.CommentMaxLength)]
         public string Comment { get; set; }
 
         // Navigation

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CombatEssentials.Domain.Validations;
 
 namespace CombatEssentials.Domain.Entities
 {
@@ -19,7 +20,7 @@ namespace CombatEssentials.Domain.Entities
         [Required]
         public int ProductId { get; set; }
 
-        [Required, Range(1, 100)]
+        [Required, Range(OrderItemValidations.QuantityMinValue, OrderItemValidations.QuantityMaxValue)]
         public int Quantity { get; set; }
 
         [Required, Column(TypeName = "decimal(18,2)")]

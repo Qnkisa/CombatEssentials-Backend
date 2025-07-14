@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CombatEssentials.Domain.Validations;
 
 namespace CombatEssentials.Domain.Entities
 {
@@ -15,10 +16,10 @@ namespace CombatEssentials.Domain.Entities
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(200)]
+        [Required, MaxLength(ProductValidations.NameMaxLength)]
         public string Name { get; set; }
 
-        [MaxLength(1000)]
+        [MaxLength(ProductValidations.DescriptionMaxLength)]
         public string Description { get; set; }
         [Required]
         public string ImageUrl { get; set; }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CombatEssentials.Domain.Validations
 {
-    public class EntitiesValidations
+    public static class CategoryValidations
     {
-
+        public const int NameMaxLength = 100;
     }
 }
