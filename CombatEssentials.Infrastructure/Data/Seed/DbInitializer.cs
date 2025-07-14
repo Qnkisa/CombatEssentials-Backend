@@ -23,11 +23,15 @@ namespace CombatEssentials.Infrastructure.Data.Seed
 
             // Seed admin user
             var adminEmail = "admin@combat.com";
+            var adminFirstName = "Admin";
+            var adminLastName = "Adminov";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
             {
                 adminUser = new ApplicationUser
                 {
+                    FirstName = adminFirstName,
+                    LastName = adminLastName,
                     UserName = adminEmail,
                     Email = adminEmail,
                     EmailConfirmed = true
