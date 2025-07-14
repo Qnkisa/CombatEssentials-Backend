@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using CombatEssentials.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CombatEssentials.Infrastructure.Data.Seed
 {
@@ -42,6 +43,27 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                 {
                     await userManager.AddToRoleAsync(adminUser, "Admin");
                 }
+            }
+        }
+
+        public static async Task SeedCategoriesAsync(ApplicationDbContext context)
+        {
+            if (!await context.Categories.AnyAsync())
+            {
+                var categories = new List<Category>
+                {
+                    new Category { Name = "Gloves" },
+                    new Category { Name = "Headgear" },
+                    new Category { Name = "Shin Guards" },
+                    new Category { Name = "Mouthguards" },
+                    new Category { Name = "Training Pads" },
+                    new Category { Name = "Apparel" },
+                    new Category { Name = "Footwear" },
+                    new Category { Name = "Weapons" }
+                };
+
+                context.Categories.AddRange(categories);
+                await context.SaveChangesAsync();
             }
         }
     }

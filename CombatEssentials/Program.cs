@@ -62,9 +62,17 @@ namespace CombatEssentials.API
                 ));
 
             // Add Identity
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 1;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequiredUniqueChars = 0;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
             // Configure JWT settings
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -105,7 +113,10 @@ namespace CombatEssentials.API
                 var services = scope.ServiceProvider;
                 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                var dbContext = services.GetRequiredService<ApplicationDbContext>();
+
                 await DbInitializer.SeedRolesAndAdminAsync(userManager, roleManager);
+                await DbInitializer.SeedCategoriesAsync(dbContext);
             }
 
             // Configure middleware
