@@ -45,6 +45,18 @@ namespace CombatEssentials.API
                 });
             });
 
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("https://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
+
             // Add custom services
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IProductService, ProductService>();
@@ -58,7 +70,7 @@ namespace CombatEssentials.API
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
-                    sqlOptions => sqlOptions.MigrationsAssembly("CombatEssentials.API") // adjust if needed
+                    sqlOptions => sqlOptions.MigrationsAssembly("CombatEssentials.API")
                 ));
 
             // Add Identity
@@ -127,6 +139,8 @@ namespace CombatEssentials.API
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowFrontend");
 
             app.UseAuthentication();
             app.UseAuthorization();
