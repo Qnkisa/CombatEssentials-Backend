@@ -42,6 +42,15 @@ namespace CombatEssentials.API.Controllers
             return Ok(product);
         }
 
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllForAdmin([FromQuery] int page = 1)
+        {
+            if (page < 1) return BadRequest("Page number must be 1 or greater.");
+            var products = await _service.GetAllForAdminAsync(page);
+            return Ok(products);
+        }
+
         [HttpPost]
         [Consumes("multipart/form-data")]
         [Authorize(Roles = "Admin")]
@@ -65,11 +74,22 @@ namespace CombatEssentials.API.Controllers
             return Ok(result.Message);
         }
 
-        [HttpDelete("{id}")]
+        [HttpPut("delete/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);
+            if (!result.Success)
+                return NotFound(result.Message);
+
+            return Ok(result.Message);
+        }
+
+        [HttpPut("undelete/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Undelete(int id)
+        {
+            var result = await _service.UndeleteAsync(id);
             if (!result.Success)
                 return NotFound(result.Message);
 

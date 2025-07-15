@@ -30,6 +30,7 @@ namespace CombatEssentials.Application.Services
 
             return await _context.Products
                 .Include(p => p.Category)
+                .Where(p => !p.IsDeleted)
                 .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -53,6 +54,7 @@ namespace CombatEssentials.Application.Services
 
             return await _context.Products
                 .Include(p => p.Category)
+                .Where(p => !p.IsDeleted)
                 .OrderBy(p => Guid.NewGuid())
                 .Take(takeCount)
                 .Select(p => new ProductDto
@@ -72,7 +74,8 @@ namespace CombatEssentials.Application.Services
         {
             var product = await _context.Products
                 .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .Where(p => !p.IsDeleted && p.Id == id)
+                .FirstOrDefaultAsync();
 
             if (product == null) return null;
 
@@ -135,9 +138,46 @@ namespace CombatEssentials.Application.Services
             if (product == null)
                 return (false, $"Product with ID {id} not found.");
 
-            _context.Products.Remove(product);
+            product.IsDeleted = true;
             await _context.SaveChangesAsync();
             return (true, "Product deleted successfully.");
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetAllForAdminAsync(int page)
+        {
+            const int pageSize = 15;
+            return await _context.Products
+                .Include(p => p.Category)
+                .OrderBy(p => p.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    CategoryId = p.CategoryId,
+                    CategoryName = p.Category.Name,
+                    ImageUrl = p.ImageUrl,
+                    IsDeleted = p.IsDeleted
+                })
+                .ToListAsync();
+        }
+
+        public async Task<(bool Success, string Message)> UndeleteAsync(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return (false, $"Product with ID {id} not found.");
+
+            if (!product.IsDeleted)
+                return (false, "Product is not deleted.");
+
+            product.IsDeleted = false;
+            await _context.SaveChangesAsync();
+
+            return (true, "Product restored successfully.");
         }
 
         private async Task<string> SaveImageAsync(IFormFile file)

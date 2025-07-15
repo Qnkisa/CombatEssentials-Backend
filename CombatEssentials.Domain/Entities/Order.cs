@@ -15,18 +15,25 @@ namespace CombatEssentials.Domain.Entities
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
         [Required]
         public DateTime OrderDate { get; set; }
 
         [Required, Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
+
         [Required]
         public OrderStatus OrderStatus { get; set; }
+
         [Required, MaxLength(200)]
         public string ShippingAddress { get; set; }
+
+        [Required, MaxLength(100)]
+        public string FullName { get; set; }
+
+        [Required, MaxLength(20)]
+        public string PhoneNumber { get; set; }
 
         // Navigation
         [ForeignKey("UserId")]
@@ -34,4 +41,5 @@ namespace CombatEssentials.Domain.Entities
 
         public ICollection<OrderItem> OrderItems { get; set; }
     }
+
 }

@@ -18,7 +18,6 @@ namespace CombatEssentials.API.Controllers
             _orderService = orderService;
         }
 
-        // GET: api/orders
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
@@ -37,6 +36,7 @@ namespace CombatEssentials.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
@@ -46,10 +46,15 @@ namespace CombatEssentials.API.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> Create(CreateOrderDto dto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = null;
+
+            if (User.Identity.IsAuthenticated)
+            {
+                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+
             var created = await _orderService.CreateAsync(userId, dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
@@ -58,18 +63,18 @@ namespace CombatEssentials.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateOrderDto dto)
         {
-            var success = await _orderService.UpdateAsync(id, dto.ShippingAddress, dto.OrderStatus);
-            if (!success) return NotFound();
-            return NoContent();
+            var result = await _orderService.UpdateAsync(id, dto);
+            if (!result.Success) return NotFound(result.Message);
+            return Ok(result.Message);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            var success = await _orderService.DeleteAsync(id);
-            if (!success) return NotFound();
-            return NoContent();
+            var result = await _orderService.DeleteAsync(id);
+            if (!result.Success) return NotFound(result.Message);
+            return Ok(result.Message);
         }
     }
 }

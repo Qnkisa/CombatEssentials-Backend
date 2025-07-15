@@ -52,13 +52,15 @@ namespace CombatEssentials.Application.Services
             return orders.Select(MapToDto);
         }
 
-        public async Task<OrderDto> CreateAsync(string userId, CreateOrderDto dto)
+        public async Task<OrderDto> CreateAsync(string? userId, CreateOrderDto dto)
         {
             var order = new Order
             {
-                UserId = userId,
+                UserId = string.IsNullOrEmpty(userId) ? null : userId,
                 OrderDate = DateTime.UtcNow,
                 ShippingAddress = dto.ShippingAddress,
+                FullName = dto.FullName,
+                PhoneNumber = dto.PhoneNumber,
                 OrderStatus = OrderStatus.Pending,
                 OrderItems = new List<OrderItem>()
             };
@@ -84,30 +86,58 @@ namespace CombatEssentials.Application.Services
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            return MapToDto(order);
+            var savedOrder = await _context.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == order.Id);
+
+            return MapToDto(savedOrder);
         }
 
-        public async Task<bool> UpdateAsync(int id, string shippingAddress, string status)
-        {
-            var existing = await _context.Orders.FindAsync(id);
-            if (existing == null) return false;
 
-            existing.ShippingAddress = shippingAddress;
-            if (Enum.TryParse<OrderStatus>(status, true, out var parsedStatus))
+        public async Task<(bool Success, string Message)> UpdateAsync(int id, UpdateOrderDto dto)
+        {
+            var existing = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == id);
+            if (existing == null) return (false, "Order not found.");
+
+            existing.FullName = dto.FullName;
+            existing.PhoneNumber = dto.PhoneNumber;
+            existing.ShippingAddress = dto.ShippingAddress;
+            if (Enum.TryParse<OrderStatus>(dto.OrderStatus, true, out var parsedStatus))
                 existing.OrderStatus = parsedStatus;
 
+            _context.OrderItems.RemoveRange(existing.OrderItems);
+            existing.OrderItems.Clear();
+
+            foreach (var itemDto in dto.OrderItems)
+            {
+                var product = await _context.Products.FindAsync(itemDto.ProductId);
+                if (product == null) continue;
+                var total = product.Price * itemDto.Quantity;
+                existing.OrderItems.Add(new OrderItem
+                {
+                    ProductId = product.Id,
+                    Quantity = itemDto.Quantity,
+                    UnitPrice = product.Price,
+                    TotalAmount = total
+                });
+            }
+            existing.TotalAmount = existing.OrderItems.Sum(i => i.TotalAmount);
+
             await _context.SaveChangesAsync();
-            return true;
+            return (true, "Order updated successfully.");
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<(bool Success, string Message)> DeleteAsync(int id)
         {
             var order = await _context.Orders.FindAsync(id);
-            if (order == null) return false;
+            if (order == null) return (false, "Order not found.");
 
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
-            return true;
+            return (true, "Order deleted successfully.");
         }
 
         // Helper
@@ -120,6 +150,8 @@ namespace CombatEssentials.Application.Services
                 OrderDate = order.OrderDate,
                 TotalAmount = order.TotalAmount,
                 ShippingAddress = order.ShippingAddress,
+                FullName = order.FullName,
+                PhoneNumber = order.PhoneNumber,
                 OrderStatus = order.OrderStatus.ToString(),
                 OrderItems = order.OrderItems.Select(oi => new OrderItemDto
                 {
