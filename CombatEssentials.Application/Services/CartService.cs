@@ -16,18 +16,36 @@ namespace CombatEssentials.Application.Services
         private readonly ApplicationDbContext _context;
         public CartService(ApplicationDbContext context) => _context = context;
 
-        public async Task<IEnumerable<CartItem>> GetCartItemsAsync(string userId)
+        public async Task<IEnumerable<GetCartItemDto>> GetCartItemsAsync(string userId)
         {
-            var cart = await _context.ShoppingCarts
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Product)
-                .FirstOrDefaultAsync(c => c.UserId == userId);
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(sc => sc.CartItems)
+                    .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(sc => sc.UserId == userId);
 
-            return cart?.CartItems ?? new List<CartItem>();
+            if (shoppingCart == null)
+                return new List<GetCartItemDto>();
+
+            return shoppingCart.CartItems.Select(ci => new GetCartItemDto
+            {
+                Id = ci.Id,
+                ShoppingCartId = ci.ShoppingCartId,
+                ProductId = ci.ProductId,
+                ProductName = ci.Product.Name,
+                ProductPrice = ci.Product.Price,
+                Quantity = ci.Quantity
+            }).ToList();
         }
 
-        public async Task AddToCartAsync(string userId, CartItemDto dto)
+        public async Task<(bool Success, string Message)> AddToCartAsync(string userId, CartItemDto dto)
         {
+            var product = await _context.Products.FindAsync(dto.ProductId);
+            if (product == null)
+                return (false, "Product not found.");
+
+            if (dto.Quantity < 1)
+                return (false, "Quantity must be at least 1.");
+
             var cart = await _context.ShoppingCarts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
             if (cart == null)
             {
@@ -38,35 +56,59 @@ namespace CombatEssentials.Application.Services
             var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == dto.ProductId);
             if (existingItem != null)
             {
-                existingItem.Quantity += dto.Quantity;
+                return (false, "Item is already in the cart.");
             }
-            else
+
+            cart.CartItems.Add(new CartItem
             {
-                cart.CartItems.Add(new CartItem { ProductId = dto.ProductId, Quantity = dto.Quantity });
-            }
+                ProductId = dto.ProductId,
+                Quantity = dto.Quantity
+            });
+
             await _context.SaveChangesAsync();
+            return (true, "Item added to cart.");
         }
 
-        public async Task RemoveFromCartAsync(string userId, int productId)
+        public async Task<(bool Success, string Message)> RemoveFromCartAsync(string userId, int cartItemId)
         {
-            var cart = await _context.ShoppingCarts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
-            if (cart == null) return;
+            var cartItem = await _context.CartItems
+                .Include(ci => ci.ShoppingCart)
+                .FirstOrDefaultAsync(ci => ci.Id == cartItemId && ci.ShoppingCart.UserId == userId);
 
-            var item = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
-            if (item != null)
-            {
-                _context.CartItems.Remove(item);
-                await _context.SaveChangesAsync();
-            }
+            if (cartItem == null)
+                return (false, "Item not found or doesn't belong to the user.");
+
+            _context.CartItems.Remove(cartItem);
+            await _context.SaveChangesAsync();
+            return (true, "Item removed from cart.");
         }
 
-        public async Task ClearCartAsync(string userId)
+        public async Task<(bool Success, string Message)> ClearCartAsync(string userId)
         {
             var cart = await _context.ShoppingCarts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
-            if (cart == null) return;
+            if (cart == null || !cart.CartItems.Any())
+                return (false, "Cart is already empty.");
 
             _context.CartItems.RemoveRange(cart.CartItems);
             await _context.SaveChangesAsync();
+            return (true, "Cart cleared.");
+        }
+
+        public async Task<(bool Success, string Message)> UpdateQuantityAsync(string userId, int cartItemId, int quantity)
+        {
+            if (quantity < 1)
+                return (false, "Quantity must be at least 1.");
+
+            var cartItem = await _context.CartItems
+                .Include(ci => ci.ShoppingCart)
+                .FirstOrDefaultAsync(ci => ci.Id == cartItemId && ci.ShoppingCart.UserId == userId);
+
+            if (cartItem == null)
+                return (false, "Cart item not found or doesn't belong to the user.");
+
+            cartItem.Quantity = quantity;
+            await _context.SaveChangesAsync();
+            return (true, "Quantity updated.");
         }
     }
 

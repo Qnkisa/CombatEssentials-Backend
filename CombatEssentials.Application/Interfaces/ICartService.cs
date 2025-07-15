@@ -10,9 +10,10 @@ namespace CombatEssentials.Application.Interfaces
 {
     public interface ICartService
     {
-        Task<IEnumerable<CartItem>> GetCartItemsAsync(string userId);
-        Task AddToCartAsync(string userId, CartItemDto dto);
-        Task RemoveFromCartAsync(string userId, int productId);
-        Task ClearCartAsync(string userId);
+        Task<IEnumerable<GetCartItemDto>> GetCartItemsAsync(string userId);
+        Task<(bool Success, string Message)> AddToCartAsync(string userId, CartItemDto dto);
+        Task<(bool Success, string Message)> RemoveFromCartAsync(string userId, int cartItemId);
+        Task<(bool Success, string Message)> ClearCartAsync(string userId);
+        Task<(bool Success, string Message)> UpdateQuantityAsync(string userId, int cartItemId, int quantity);
     }
 }

@@ -8,59 +8,71 @@ namespace CombatEssentials.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Requires authentication
+    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
+        public CartController(ICartService cartService) => _cartService = cartService;
 
-        public CartController(ICartService cartService)
-        {
-            _cartService = cartService;
-        }
+        private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        // Helper to get the authenticated user's ID
-        private string GetUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier);
-        }
-
-        // GET: api/cart
         [HttpGet]
-        public async Task<IActionResult> GetCartItems()
+        public async Task<ActionResult<List<GetCartItemDto>>> GetCartItems()
         {
-            var userId = GetUserId();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
             var items = await _cartService.GetCartItemsAsync(userId);
             return Ok(items);
         }
 
-        // POST: api/cart
         [HttpPost]
         public async Task<IActionResult> AddToCart([FromBody] CartItemDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userId = GetUserId();
-            await _cartService.AddToCartAsync(userId, dto);
-            return Ok(new { message = "Item added to cart." });
+            var result = await _cartService.AddToCartAsync(GetUserId(), dto);
+            if (!result.Success)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
         }
 
-        // DELETE: api/cart/{productId}
-        [HttpDelete("{productId}")]
-        public async Task<IActionResult> RemoveFromCart(int productId)
+        [HttpDelete("{cartItemId}")]
+        public async Task<IActionResult> RemoveFromCart(int cartItemId)
         {
-            var userId = GetUserId();
-            await _cartService.RemoveFromCartAsync(userId, productId);
-            return Ok(new { message = "Item removed from cart." });
+            var result = await _cartService.RemoveFromCartAsync(GetUserId(), cartItemId);
+            if (!result.Success)
+                return NotFound(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
         }
 
-        // DELETE: api/cart/clear
         [HttpDelete("clear")]
         public async Task<IActionResult> ClearCart()
         {
-            var userId = GetUserId();
-            await _cartService.ClearCartAsync(userId);
-            return Ok(new { message = "Cart cleared." });
+            var result = await _cartService.ClearCartAsync(GetUserId());
+            if (!result.Success)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
+        }
+
+        // PATCH: api/cart/update-quantity/{cartItemId}
+        [HttpPatch("update-quantity/{cartItemId}")]
+        public async Task<IActionResult> UpdateQuantity(int cartItemId, [FromBody] UpdateCartQuantityDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _cartService.UpdateQuantityAsync(GetUserId(), cartItemId, dto.Quantity);
+            if (!result.Success)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
         }
     }
 }

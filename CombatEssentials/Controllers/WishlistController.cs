@@ -17,10 +17,18 @@ namespace CombatEssentials.API.Controllers
             _wishlistService = wishlistService;
         }
 
+        private string GetUserId()
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "User is not authenticated." });
+
             var items = await _wishlistService.GetWishlistAsync(userId);
             return Ok(items);
         }
@@ -28,17 +36,41 @@ namespace CombatEssentials.API.Controllers
         [HttpPost("{productId}")]
         public async Task<IActionResult> Add(int productId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _wishlistService.AddToWishlistAsync(userId, productId);
-            return Ok();
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "User is not authenticated." });
+
+            var (success, message) = await _wishlistService.AddToWishlistAsync(userId, productId);
+
+            if (!success)
+            {
+                if (message == "Product not found.")
+                    return NotFound(new { message });
+                if (message == "Product is already in the wishlist.")
+                    return Conflict(new { message });
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message });
         }
 
         [HttpDelete("{productId}")]
         public async Task<IActionResult> Remove(int productId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _wishlistService.RemoveFromWishlistAsync(userId, productId);
-            return Ok();
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "User is not authenticated." });
+
+            var (success, message) = await _wishlistService.RemoveFromWishlistAsync(userId, productId);
+
+            if (!success)
+            {
+                if (message == "Product not found in wishlist.")
+                    return NotFound(new { message });
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message });
         }
     }
 }

@@ -25,6 +25,15 @@ namespace CombatEssentials.API.Controllers
             return Ok(products);
         }
 
+        [HttpGet("random")]
+        public async Task<IActionResult> GetRandom([FromQuery] int count = 9)
+        {
+            if (count < 1) return BadRequest("Count must be greater than 0.");
+
+            var products = await _service.GetRandomProductsAsync(count);
+            return Ok(products);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -34,29 +43,37 @@ namespace CombatEssentials.API.Controllers
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromForm] CreateProductDto dto)
         {
-            var created = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            var result = await _service.CreateAsync(dto);
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return CreatedAtAction(nameof(GetById), new { id = result.CreatedProduct!.Id }, result.CreatedProduct);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromForm] UpdateProductDto dto)
         {
-            var success = await _service.UpdateAsync(id, dto);
-            if (!success) return NotFound();
-            return NoContent();
+            var result = await _service.UpdateAsync(id, dto);
+            if (!result.Success)
+                return NotFound(result.Message);
+
+            return Ok(result.Message);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            var success = await _service.DeleteAsync(id);
-            if (!success) return NotFound();
-            return NoContent();
+            var result = await _service.DeleteAsync(id);
+            if (!result.Success)
+                return NotFound(result.Message);
+
+            return Ok(result.Message);
         }
     }
 }

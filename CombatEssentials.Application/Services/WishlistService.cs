@@ -20,36 +20,50 @@ namespace CombatEssentials.Application.Services
         {
             return await _context.Wishlists
                 .Where(w => w.UserId == userId)
+                .Include(w => w.Product)
+                    .ThenInclude(p => p.Category)
                 .Select(w => new ProductDto
                 {
                     Id = w.Product.Id,
                     Name = w.Product.Name,
                     Price = w.Product.Price,
+                    Description = w.Product.Description,
                     ImageUrl = w.Product.ImageUrl,
                     CategoryName = w.Product.Category.Name
                 })
                 .ToListAsync();
         }
 
-        public async Task AddToWishlistAsync(string userId, int productId)
+        public async Task<(bool Success, string Message)> AddToWishlistAsync(string userId, int productId)
         {
-            if (!await _context.Wishlists.AnyAsync(w => w.UserId == userId && w.ProductId == productId))
-            {
-                _context.Wishlists.Add(new Wishlist { UserId = userId, ProductId = productId });
-                await _context.SaveChangesAsync();
-            }
+            if (string.IsNullOrEmpty(userId))
+                return (false, "User is not authenticated.");
+
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null)
+                return (false, "Product not found.");
+
+            var exists = await _context.Wishlists.AnyAsync(w => w.UserId == userId && w.ProductId == productId);
+            if (exists)
+                return (false, "Product is already in the wishlist.");
+
+            _context.Wishlists.Add(new Wishlist { UserId = userId, ProductId = productId });
+            await _context.SaveChangesAsync();
+            return (true, "Product added to wishlist.");
         }
 
-        public async Task RemoveFromWishlistAsync(string userId, int productId)
+        public async Task<(bool Success, string Message)> RemoveFromWishlistAsync(string userId, int productId)
         {
-            var item = await _context.Wishlists
-                .FirstOrDefaultAsync(w => w.UserId == userId && w.ProductId == productId);
+            if (string.IsNullOrEmpty(userId))
+                return (false, "User is not authenticated.");
 
-            if (item != null)
-            {
-                _context.Wishlists.Remove(item);
-                await _context.SaveChangesAsync();
-            }
+            var item = await _context.Wishlists.FirstOrDefaultAsync(w => w.UserId == userId && w.ProductId == productId);
+            if (item == null)
+                return (false, "Product not found in wishlist.");
+
+            _context.Wishlists.Remove(item);
+            await _context.SaveChangesAsync();
+            return (true, "Product removed from wishlist.");
         }
     }
 

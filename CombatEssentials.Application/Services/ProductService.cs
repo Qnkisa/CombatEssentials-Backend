@@ -46,6 +46,28 @@ namespace CombatEssentials.Application.Services
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<ProductDto>> GetRandomProductsAsync(int count = 9)
+        {
+            var totalProducts = await _context.Products.CountAsync();
+            var takeCount = Math.Min(count, totalProducts);
+
+            return await _context.Products
+                .Include(p => p.Category)
+                .OrderBy(p => Guid.NewGuid())
+                .Take(takeCount)
+                .Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    CategoryId = p.CategoryId,
+                    CategoryName = p.Category.Name,
+                    ImageUrl = p.ImageUrl
+                })
+                .ToListAsync();
+        }
+
         public async Task<ProductDto?> GetByIdAsync(int id)
         {
             var product = await _context.Products
@@ -66,7 +88,7 @@ namespace CombatEssentials.Application.Services
             };
         }
 
-        public async Task<ProductDto> CreateAsync(CreateProductDto dto)
+        public async Task<(bool Success, string Message, ProductDto? CreatedProduct)> CreateAsync(CreateProductDto dto)
         {
             var imageUrl = await SaveImageAsync(dto.ImageFile);
 
@@ -82,13 +104,18 @@ namespace CombatEssentials.Application.Services
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            return await GetByIdAsync(product.Id) ?? throw new Exception("Product creation failed.");
+            var created = await GetByIdAsync(product.Id);
+            if (created == null)
+                return (false, "Product creation failed.", null);
+
+            return (true, "Product created successfully.", created);
         }
 
-        public async Task<bool> UpdateAsync(int id, UpdateProductDto dto)
+        public async Task<(bool Success, string Message)> UpdateAsync(int id, UpdateProductDto dto)
         {
             var product = await _context.Products.FindAsync(id);
-            if (product == null) return false;
+            if (product == null)
+                return (false, $"Product with ID {id} not found.");
 
             var imageUrl = await SaveImageAsync(dto.ImageFile);
 
@@ -99,17 +126,18 @@ namespace CombatEssentials.Application.Services
             product.ImageUrl = imageUrl;
 
             await _context.SaveChangesAsync();
-            return true;
+            return (true, "Product updated successfully.");
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<(bool Success, string Message)> DeleteAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);
-            if (product == null) return false;
+            if (product == null)
+                return (false, $"Product with ID {id} not found.");
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
-            return true;
+            return (true, "Product deleted successfully.");
         }
 
         private async Task<string> SaveImageAsync(IFormFile file)
