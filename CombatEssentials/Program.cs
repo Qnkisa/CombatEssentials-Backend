@@ -130,6 +130,13 @@ namespace CombatEssentials.API
                 await DbInitializer.SeedRolesAndAdminAsync(userManager, roleManager);
                 await DbInitializer.SeedCategoriesAsync(dbContext);
                 await DbInitializer.SeedProductsAsync(dbContext);
+                await DbInitializer.SeedUsersAsync(userManager);
+                await DbInitializer.SeedShoppingCartsAsync(dbContext);
+                await DbInitializer.SeedCartItemsAsync(dbContext);
+                await DbInitializer.SeedWishlistsAsync(dbContext);
+                await DbInitializer.SeedOrdersAsync(dbContext);
+                await DbInitializer.SeedOrderItemsAsync(dbContext);
+                await DbInitializer.SeedReviewsAsync(dbContext);
             }
 
             // Configure middleware

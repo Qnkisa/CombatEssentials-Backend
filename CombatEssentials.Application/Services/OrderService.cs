@@ -21,11 +21,15 @@ namespace CombatEssentials.Application.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<OrderDto>> GetAllAsync()
+        public async Task<IEnumerable<OrderDto>> GetAllAsync(int page)
         {
+            const int pageSize = 15;
             var orders = await _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
+                .OrderByDescending(o => o.OrderDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return orders.Select(MapToDto);
@@ -41,12 +45,16 @@ namespace CombatEssentials.Application.Services
             return order == null ? null : MapToDto(order);
         }
 
-        public async Task<IEnumerable<OrderDto>> GetByUserIdAsync(string userId)
+        public async Task<IEnumerable<OrderDto>> GetByUserIdAsync(string userId, int page)
         {
+            const int pageSize = 15;
             var orders = await _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
                 .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.OrderDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return orders.Select(MapToDto);

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace CombatEssentials.API.Controllers
+namespace CombatEssentials.API.Areas.UserControllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -23,13 +23,13 @@ namespace CombatEssentials.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1)
         {
             var userId = GetUserId();
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized(new { message = "User is not authenticated." });
 
-            var items = await _wishlistService.GetWishlistAsync(userId);
+            var items = await _wishlistService.GetWishlistAsync(userId, page);
             return Ok(items);
         }
 

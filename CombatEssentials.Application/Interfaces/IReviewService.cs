@@ -10,9 +10,10 @@ namespace CombatEssentials.Application.Interfaces
 {
     public interface IReviewService
     {
-        Task<IEnumerable<GetReviewDto>> GetReviewsForProductAsync(int productId);
+        Task<IEnumerable<GetReviewDto>> GetReviewsForProductAsync(int productId, int page);
         Task AddReviewAsync(string userId, ReviewDto dto);
         Task<(bool Success, string Message)> DeleteReviewAsync(string userId, int reviewId);
+        Task<double> GetAverageRatingForProductAsync(int productId);
     }
 
 }

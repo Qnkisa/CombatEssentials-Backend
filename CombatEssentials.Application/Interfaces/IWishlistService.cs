@@ -9,7 +9,7 @@ namespace CombatEssentials.Application.Interfaces
 {
     public interface IWishlistService
     {
-        Task<IEnumerable<ProductDto>> GetWishlistAsync(string userId);
+        Task<IEnumerable<ProductDto>> GetWishlistAsync(string userId, int page);
         Task<(bool Success, string Message)> AddToWishlistAsync(string userId, int productId);
         Task<(bool Success, string Message)> RemoveFromWishlistAsync(string userId, int productId);
     }

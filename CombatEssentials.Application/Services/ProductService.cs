@@ -24,13 +24,24 @@ namespace CombatEssentials.Application.Services
             _env = env;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync(int page)
+        public async Task<IEnumerable<ProductDto>> GetAllAsync(int page, int? categoryId = null, string? name = null)
         {
             const int pageSize = 15;
 
-            return await _context.Products
+            var query = _context.Products
                 .Include(p => p.Category)
-                .Where(p => !p.IsDeleted)
+                .Where(p => !p.IsDeleted);
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                query = query.Where(p => p.Name.ToLower().Contains(name.ToLower()));
+            }
+
+            return await query
                 .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -143,11 +154,23 @@ namespace CombatEssentials.Application.Services
             return (true, "Product deleted successfully.");
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllForAdminAsync(int page)
+        public async Task<IEnumerable<ProductDto>> GetAllForAdminAsync(int page, int? categoryId = null, string? name = null)
         {
             const int pageSize = 15;
-            return await _context.Products
+            var query = _context.Products
                 .Include(p => p.Category)
+                .AsQueryable();
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                query = query.Where(p => p.Name.ToLower().Contains(name.ToLower()));
+            }
+
+            return await query
                 .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

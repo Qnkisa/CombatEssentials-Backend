@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace CombatEssentials.API.Controllers
+namespace CombatEssentials.API.Areas.UserControllers
 {
     [Route("api/[controller]")]
     [ApiController]

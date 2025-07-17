@@ -16,11 +16,15 @@ namespace CombatEssentials.Application.Services
         private readonly ApplicationDbContext _context;
         public ReviewService(ApplicationDbContext context) => _context = context;
 
-        public async Task<IEnumerable<GetReviewDto>> GetReviewsForProductAsync(int productId)
+        public async Task<IEnumerable<GetReviewDto>> GetReviewsForProductAsync(int productId, int page)
         {
+            const int pageSize = 15;
             return await _context.Reviews
                 .Where(r => r.ProductId == productId)
                 .Include(r => r.User)
+                .OrderByDescending(r => r.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(r => new GetReviewDto
                 {
                     Id = r.Id,
@@ -59,6 +63,14 @@ namespace CombatEssentials.Application.Services
             _context.Reviews.Remove(review);
             await _context.SaveChangesAsync();
             return (true, "Review deleted successfully.");
+        }
+
+        public async Task<double> GetAverageRatingForProductAsync(int productId)
+        {
+            return await _context.Reviews
+                .Where(r => r.ProductId == productId)
+                .Select(r => (double?)r.Rating)
+                .AverageAsync() ?? 0.0;
         }
     }
 }

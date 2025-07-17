@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace CombatEssentials.API.Controllers
+namespace CombatEssentials.API.Areas.UserControllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -26,10 +26,19 @@ namespace CombatEssentials.API.Controllers
         // GET: api/review/product/{productId}
         [HttpGet("product/{productId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetReviewsForProduct(int productId)
+        public async Task<IActionResult> GetReviewsForProduct(int productId, [FromQuery] int page = 1)
         {
-            var reviews = await _reviewService.GetReviewsForProductAsync(productId);
+            var reviews = await _reviewService.GetReviewsForProductAsync(productId, page);
             return Ok(reviews);
+        }
+
+        // GET: api/review/product/{productId}/average
+        [HttpGet("product/{productId}/average")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAverageRatingForProduct(int productId)
+        {
+            var average = await _reviewService.GetAverageRatingForProductAsync(productId);
+            return Ok(new { productId, averageRating = average });
         }
 
         // POST: api/review

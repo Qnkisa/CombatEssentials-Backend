@@ -10,9 +10,9 @@ namespace CombatEssentials.Application.Interfaces
 {
     public interface IOrderService
     {
-        Task<IEnumerable<OrderDto>> GetAllAsync();
+        Task<IEnumerable<OrderDto>> GetAllAsync(int page);
         Task<OrderDto?> GetByIdAsync(int id);
-        Task<IEnumerable<OrderDto>> GetByUserIdAsync(string userId);
+        Task<IEnumerable<OrderDto>> GetByUserIdAsync(string userId, int page);
         Task<OrderDto> CreateAsync(string userId, CreateOrderDto createDto);
         Task<(bool Success, string Message)> UpdateAsync(int id, UpdateOrderDto dto);
         Task<(bool Success, string Message)> DeleteAsync(int id);

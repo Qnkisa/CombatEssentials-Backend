@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Identity\" />
-    <Folder Include="Repositories\" />
+    <Compile Remove="Identity\**" />
+    <Compile Remove="Repositories\**" />
+    <EmbeddedResource Remove="Identity\**" />
+    <EmbeddedResource Remove="Repositories\**" />
+    <None Remove="Identity\**" />
+    <None Remove="Repositories\**" />
   </ItemGroup>
 
   <ItemGroup>

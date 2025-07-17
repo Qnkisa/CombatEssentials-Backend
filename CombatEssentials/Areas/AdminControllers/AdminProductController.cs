@@ -3,57 +3,30 @@ using CombatEssentials.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CombatEssentials.API.Controllers
+namespace CombatEssentials.API.Areas.AdminControllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class ProductController : ControllerBase
+    [Route("api/admin/products")]
+    [Authorize(Roles = "Admin")]
+    public class AdminProductController : ControllerBase
     {
         private readonly IProductService _service;
 
-        public ProductController(IProductService service)
+        public AdminProductController(IProductService service)
         {
             _service = service;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int page = 1)
+        public async Task<IActionResult> GetAllForAdmin([FromQuery] int page = 1, [FromQuery] int? categoryId = null, [FromQuery] string? name = null)
         {
             if (page < 1) return BadRequest("Page number must be 1 or greater.");
-
-            var products = await _service.GetAllAsync(page);
-            return Ok(products);
-        }
-
-        [HttpGet("random")]
-        public async Task<IActionResult> GetRandom([FromQuery] int count = 9)
-        {
-            if (count < 1) return BadRequest("Count must be greater than 0.");
-
-            var products = await _service.GetRandomProductsAsync(count);
-            return Ok(products);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var product = await _service.GetByIdAsync(id);
-            if (product == null) return NotFound();
-            return Ok(product);
-        }
-
-        [HttpGet("admin")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllForAdmin([FromQuery] int page = 1)
-        {
-            if (page < 1) return BadRequest("Page number must be 1 or greater.");
-            var products = await _service.GetAllForAdminAsync(page);
+            var products = await _service.GetAllForAdminAsync(page, categoryId, name);
             return Ok(products);
         }
 
         [HttpPost]
         [Consumes("multipart/form-data")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromForm] CreateProductDto dto)
         {
             var result = await _service.CreateAsync(dto);
@@ -64,7 +37,6 @@ namespace CombatEssentials.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromForm] UpdateProductDto dto)
         {
             var result = await _service.UpdateAsync(id, dto);
@@ -75,7 +47,6 @@ namespace CombatEssentials.API.Controllers
         }
 
         [HttpPut("delete/{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);
@@ -86,7 +57,6 @@ namespace CombatEssentials.API.Controllers
         }
 
         [HttpPut("undelete/{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Undelete(int id)
         {
             var result = await _service.UndeleteAsync(id);
@@ -94,6 +64,15 @@ namespace CombatEssentials.API.Controllers
                 return NotFound(result.Message);
 
             return Ok(result.Message);
+        }
+
+        // Helper for CreatedAtAction
+        [NonAction]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var product = await _service.GetByIdAsync(id);
+            if (product == null) return NotFound();
+            return Ok(product);
         }
     }
 }

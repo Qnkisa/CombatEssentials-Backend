@@ -107,6 +107,181 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                 await context.SaveChangesAsync();
             }
         }
+
+        public static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager)
+        {
+            var users = new List<(string Email, string FirstName, string LastName)>
+            {
+                ("user1@combat.com", "Ivan", "Ivanov"),
+                ("user2@combat.com", "Petar", "Petrov"),
+                ("user3@combat.com", "Maria", "Marinova"),
+                ("user4@combat.com", "Georgi", "Georgiev"),
+                ("user5@combat.com", "Elena", "Elenova")
+            };
+
+            foreach (var (email, firstName, lastName) in users)
+            {
+                if (await userManager.FindByEmailAsync(email) == null)
+                {
+                    var user = new ApplicationUser
+                    {
+                        UserName = email,
+                        Email = email,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        EmailConfirmed = true
+                    };
+                    await userManager.CreateAsync(user, "User123!");
+                    await userManager.AddToRoleAsync(user, "User");
+                }
+            }
+        }
+
+        public static async Task SeedShoppingCartsAsync(ApplicationDbContext context)
+        {
+            if (!await context.ShoppingCarts.AnyAsync())
+            {
+                var users = await context.Users.Take(5).ToListAsync();
+                var carts = users.Select(u => new ShoppingCart { UserId = u.Id }).ToList();
+                context.ShoppingCarts.AddRange(carts);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public static async Task SeedCartItemsAsync(ApplicationDbContext context)
+        {
+            if (!await context.CartItems.AnyAsync())
+            {
+                var carts = await context.ShoppingCarts.Include(sc => sc.CartItems).ToListAsync();
+                var products = await context.Products.Take(5).ToListAsync();
+                int quantity = 1;
+                var cartItems = new List<CartItem>();
+                foreach (var cart in carts)
+                {
+                    foreach (var product in products)
+                    {
+                        cartItems.Add(new CartItem
+                        {
+                            ShoppingCartId = cart.Id,
+                            ProductId = product.Id,
+                            Quantity = quantity
+                        });
+                        quantity = quantity % 5 + 1;
+                        if (cartItems.Count >= 5) break;
+                    }
+                    if (cartItems.Count >= 5) break;
+                }
+                context.CartItems.AddRange(cartItems);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public static async Task SeedWishlistsAsync(ApplicationDbContext context)
+        {
+            if (!await context.Wishlists.AnyAsync())
+            {
+                var users = await context.Users.Take(5).ToListAsync();
+                var products = await context.Products.Take(5).ToListAsync();
+                var wishlists = new List<Wishlist>();
+                foreach (var user in users)
+                {
+                    foreach (var product in products)
+                    {
+                        wishlists.Add(new Wishlist
+                        {
+                            UserId = user.Id,
+                            ProductId = product.Id
+                        });
+                        if (wishlists.Count >= 5) break;
+                    }
+                    if (wishlists.Count >= 5) break;
+                }
+                context.Wishlists.AddRange(wishlists);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public static async Task SeedOrdersAsync(ApplicationDbContext context)
+        {
+            if (!await context.Orders.AnyAsync())
+            {
+                var users = await context.Users.Take(5).ToListAsync();
+                var orders = new List<Order>();
+                foreach (var user in users)
+                {
+                    orders.Add(new Order
+                    {
+                        UserId = user.Id,
+                        OrderDate = DateTime.UtcNow,
+                        TotalAmount = 100,
+                        OrderStatus = CombatEssentials.Domain.Enums.OrderStatus.Pending,
+                        ShippingAddress = "123 Main St",
+                        FullName = user.FirstName + " " + user.LastName,
+                        PhoneNumber = "1234567890"
+                    });
+                    if (orders.Count >= 5) break;
+                }
+                context.Orders.AddRange(orders);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public static async Task SeedOrderItemsAsync(ApplicationDbContext context)
+        {
+            if (!await context.OrderItems.AnyAsync())
+            {
+                var orders = await context.Orders.Include(o => o.OrderItems).ToListAsync();
+                var products = await context.Products.Take(5).ToListAsync();
+                var orderItems = new List<OrderItem>();
+                foreach (var order in orders)
+                {
+                    foreach (var product in products)
+                    {
+                        orderItems.Add(new OrderItem
+                        {
+                            OrderId = order.Id,
+                            ProductId = product.Id,
+                            Quantity = 1,
+                            UnitPrice = product.Price,
+                            TotalAmount = product.Price
+                        });
+                        if (orderItems.Count >= 5) break;
+                    }
+                    if (orderItems.Count >= 5) break;
+                }
+                context.OrderItems.AddRange(orderItems);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public static async Task SeedReviewsAsync(ApplicationDbContext context)
+        {
+            if (!await context.Reviews.AnyAsync())
+            {
+                var users = await context.Users.Take(5).ToListAsync();
+                var products = await context.Products.Take(5).ToListAsync();
+                var reviews = new List<Review>();
+                int rating = 5;
+                foreach (var user in users)
+                {
+                    foreach (var product in products)
+                    {
+                        reviews.Add(new Review
+                        {
+                            UserId = user.Id,
+                            ProductId = product.Id,
+                            Rating = rating,
+                            Comment = $"Great product {product.Name}!"
+                        });
+                        rating = rating == 1 ? 5 : rating - 1;
+                        if (reviews.Count >= 5) break;
+                    }
+                    if (reviews.Count >= 5) break;
+                }
+                context.Reviews.AddRange(reviews);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 
 }

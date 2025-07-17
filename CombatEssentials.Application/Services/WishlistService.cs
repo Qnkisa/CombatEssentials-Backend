@@ -16,12 +16,16 @@ namespace CombatEssentials.Application.Services
         private readonly ApplicationDbContext _context;
         public WishlistService(ApplicationDbContext context) => _context = context;
 
-        public async Task<IEnumerable<ProductDto>> GetWishlistAsync(string userId)
+        public async Task<IEnumerable<ProductDto>> GetWishlistAsync(string userId, int page)
         {
+            const int pageSize = 15;
             return await _context.Wishlists
                 .Where(w => w.UserId == userId)
                 .Include(w => w.Product)
                     .ThenInclude(p => p.Category)
+                .OrderByDescending(w => w.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(w => new ProductDto
                 {
                     Id = w.Product.Id,

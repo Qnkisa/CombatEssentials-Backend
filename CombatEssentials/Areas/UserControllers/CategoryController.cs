@@ -1,7 +1,7 @@
 ﻿using CombatEssentials.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CombatEssentials.API.Controllers
+namespace CombatEssentials.API.Areas.UserControllers
 {
     [ApiController]
     [Route("api/[controller]")]
