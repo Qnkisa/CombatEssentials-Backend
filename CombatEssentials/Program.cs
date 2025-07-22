@@ -48,12 +48,12 @@ namespace CombatEssentials.API
             // Add CORS
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowFrontend", policy =>
+                options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
+                    policy
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
             });
 
@@ -146,9 +146,11 @@ namespace CombatEssentials.API
                 app.UseSwaggerUI();
             }
 
+            app.UseStaticFiles();
+
             app.UseHttpsRedirection();
 
-            app.UseCors("AllowFrontend");
+            app.UseCors("AllowAll");
 
             app.UseAuthentication();
             app.UseAuthorization();

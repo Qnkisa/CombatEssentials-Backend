@@ -37,6 +37,7 @@ namespace CombatEssentials.API.Areas.AdminControllers
         }
 
         [HttpPut("{id}")]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Update(int id, [FromForm] UpdateProductDto dto)
         {
             var result = await _service.UpdateAsync(id, dto);
@@ -66,8 +67,7 @@ namespace CombatEssentials.API.Areas.AdminControllers
             return Ok(result.Message);
         }
 
-        // Helper for CreatedAtAction
-        [NonAction]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var product = await _service.GetByIdAsync(id);
