@@ -131,17 +131,30 @@ namespace CombatEssentials.Application.Services
             if (product == null)
                 return (false, $"Product with ID {id} not found.");
 
-            var imageUrl = await SaveImageAsync(dto.ImageFile);
-
             product.Name = dto.Name;
             product.Description = dto.Description;
             product.Price = dto.Price;
             product.CategoryId = dto.CategoryId;
-            product.ImageUrl = imageUrl;
+
+            if (dto.ImageFile != null)
+            {
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    var oldImagePath = Path.Combine(_env.WebRootPath, product.ImageUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                var imageUrl = await SaveImageAsync(dto.ImageFile);
+                product.ImageUrl = imageUrl;
+            }
 
             await _context.SaveChangesAsync();
             return (true, "Product updated successfully.");
         }
+
 
         public async Task<(bool Success, string Message)> DeleteAsync(int id)
         {

@@ -39,13 +39,5 @@ namespace CombatEssentials.API.Areas.AdminControllers
             if (!result.Success) return NotFound(result.Message);
             return Ok(result.Message);
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var result = await _orderService.DeleteAsync(id);
-            if (!result.Success) return NotFound(result.Message);
-            return Ok(result.Message);
-        }
     }
 }

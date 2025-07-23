@@ -138,16 +138,6 @@ namespace CombatEssentials.Application.Services
             return (true, "Order updated successfully.");
         }
 
-        public async Task<(bool Success, string Message)> DeleteAsync(int id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null) return (false, "Order not found.");
-
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
-            return (true, "Order deleted successfully.");
-        }
-
         // Helper
         private OrderDto MapToDto(Order order)
         {

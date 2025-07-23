@@ -19,7 +19,7 @@ namespace CombatEssentials.Domain.Entities
         [Required, MaxLength(ProductValidations.NameMaxLength)]
         public string Name { get; set; }
 
-        [MaxLength(ProductValidations.DescriptionMaxLength)]
+        [Required, MaxLength(ProductValidations.DescriptionMaxLength)]
         public string Description { get; set; }
         [Required]
         public string ImageUrl { get; set; }

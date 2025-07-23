@@ -14,7 +14,7 @@ namespace CombatEssentials.Application.DTOs.ProductDtos
         [Required, MaxLength(ProductValidations.NameMaxLength)]
         public string Name { get; set; } = string.Empty;
 
-        [MaxLength(ProductValidations.DescriptionMaxLength)]
+        [Required, MaxLength(ProductValidations.DescriptionMaxLength)]
         public string Description { get; set; } = string.Empty;
 
         [Required]
@@ -23,6 +23,6 @@ namespace CombatEssentials.Application.DTOs.ProductDtos
         [Required]
         public int CategoryId { get; set; }
 
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }

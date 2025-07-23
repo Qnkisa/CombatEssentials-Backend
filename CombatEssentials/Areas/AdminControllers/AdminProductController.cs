@@ -40,6 +40,12 @@ namespace CombatEssentials.API.Areas.AdminControllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Update(int id, [FromForm] UpdateProductDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                // Log errors or return detailed error response
+                return BadRequest(new { errors });
+            }
             var result = await _service.UpdateAsync(id, dto);
             if (!result.Success)
                 return NotFound(result.Message);

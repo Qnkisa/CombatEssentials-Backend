@@ -15,6 +15,5 @@ namespace CombatEssentials.Application.Interfaces
         Task<IEnumerable<OrderDto>> GetByUserIdAsync(string userId, int page);
         Task<OrderDto> CreateAsync(string userId, CreateOrderDto createDto);
         Task<(bool Success, string Message)> UpdateAsync(int id, UpdateOrderDto dto);
-        Task<(bool Success, string Message)> DeleteAsync(int id);
     }
 }
