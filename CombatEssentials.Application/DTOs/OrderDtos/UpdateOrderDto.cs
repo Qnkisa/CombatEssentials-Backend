@@ -15,20 +15,5 @@ namespace CombatEssentials.Application.DTOs.OrderDtos
 
         [Required]
         public string OrderStatus { get; set; }
-
-        [Required]
-        [MaxLength(200)]
-        public string ShippingAddress { get; set; }
-
-        [Required]
-        [MaxLength(100)]
-        public string FullName { get; set; }
-
-        [Required]
-        [MaxLength(20)]
-        public string PhoneNumber { get; set; }
-
-        [Required]
-        public List<CreateOrderItemDto> OrderItems { get; set; }
     }
 }

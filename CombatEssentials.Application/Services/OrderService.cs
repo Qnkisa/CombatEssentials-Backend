@@ -105,37 +105,16 @@ namespace CombatEssentials.Application.Services
 
         public async Task<(bool Success, string Message)> UpdateAsync(int id, UpdateOrderDto dto)
         {
-            var existing = await _context.Orders
-                .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.Id == id);
+            var existing = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
             if (existing == null) return (false, "Order not found.");
 
-            existing.FullName = dto.FullName;
-            existing.PhoneNumber = dto.PhoneNumber;
-            existing.ShippingAddress = dto.ShippingAddress;
             if (Enum.TryParse<OrderStatus>(dto.OrderStatus, true, out var parsedStatus))
                 existing.OrderStatus = parsedStatus;
-
-            _context.OrderItems.RemoveRange(existing.OrderItems);
-            existing.OrderItems.Clear();
-
-            foreach (var itemDto in dto.OrderItems)
-            {
-                var product = await _context.Products.FindAsync(itemDto.ProductId);
-                if (product == null) continue;
-                var total = product.Price * itemDto.Quantity;
-                existing.OrderItems.Add(new OrderItem
-                {
-                    ProductId = product.Id,
-                    Quantity = itemDto.Quantity,
-                    UnitPrice = product.Price,
-                    TotalAmount = total
-                });
-            }
-            existing.TotalAmount = existing.OrderItems.Sum(i => i.TotalAmount);
+            else
+                return (false, "Invalid order status.");
 
             await _context.SaveChangesAsync();
-            return (true, "Order updated successfully.");
+            return (true, "Order status updated successfully.");
         }
 
         // Helper
