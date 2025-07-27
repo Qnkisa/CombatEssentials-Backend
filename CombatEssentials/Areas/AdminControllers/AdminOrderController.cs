@@ -24,14 +24,6 @@ namespace CombatEssentials.API.Areas.AdminControllers
             return Ok(orders);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var order = await _orderService.GetByIdAsync(id);
-            if (order == null) return NotFound();
-            return Ok(order);
-        }
-
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateOrderDto dto)
         {

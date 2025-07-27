@@ -33,7 +33,7 @@ namespace CombatEssentials.API.Areas.AdminControllers
             if (!result.Success)
                 return BadRequest(result.Message);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.CreatedProduct!.Id }, result.CreatedProduct);
+            return CreatedAtRoute(routeName: null, routeValues: null, value: result.CreatedProduct);
         }
 
         [HttpPut("{id}")]
@@ -71,14 +71,6 @@ namespace CombatEssentials.API.Areas.AdminControllers
                 return NotFound(result.Message);
 
             return Ok(result.Message);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var product = await _service.GetByIdAsync(id);
-            if (product == null) return NotFound();
-            return Ok(product);
         }
     }
 }

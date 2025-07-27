@@ -35,16 +35,6 @@ namespace CombatEssentials.Application.Services
             return orders.Select(MapToDto);
         }
 
-        public async Task<OrderDto?> GetByIdAsync(int id)
-        {
-            var order = await _context.Orders
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.Id == id);
-
-            return order == null ? null : MapToDto(order);
-        }
-
         public async Task<IEnumerable<OrderDto>> GetByUserIdAsync(string userId, int page)
         {
             const int pageSize = 15;

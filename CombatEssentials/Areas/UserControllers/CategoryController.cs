@@ -21,14 +21,5 @@ namespace CombatEssentials.API.Areas.UserControllers
             var categories = await _categoryService.GetAllAsync();
             return Ok(categories); // Returns List<CategoryDto>
         }
-
-        // GET: api/Category/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var category = await _categoryService.GetByIdAsync(id);
-            if (category == null) return NotFound();
-            return Ok(category); // Returns CategoryDto
-        }
     }
 }
