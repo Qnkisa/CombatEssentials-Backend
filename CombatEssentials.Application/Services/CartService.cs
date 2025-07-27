@@ -32,8 +32,10 @@ namespace CombatEssentials.Application.Services
                 ShoppingCartId = ci.ShoppingCartId,
                 ProductId = ci.ProductId,
                 ProductName = ci.Product.Name,
+                ProductImageUrl = ci.Product.ImageUrl,
                 ProductPrice = ci.Product.Price,
-                Quantity = ci.Quantity
+                Quantity = ci.Quantity,
+                TotalPrice = ci.Product.Price * ci.Quantity
             }).ToList();
         }
 

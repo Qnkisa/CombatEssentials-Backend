@@ -19,8 +19,8 @@ namespace CombatEssentials.API.Areas.UserControllers
         {
             if (page < 1) return BadRequest("Page number must be 1 or greater.");
 
-            var products = await _service.GetAllAsync(page, categoryId, name);
-            return Ok(products);
+            var result = await _service.GetAllAsync(page, categoryId, name);
+            return Ok(result);
         }
 
         [HttpGet("random")]

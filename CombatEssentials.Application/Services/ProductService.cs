@@ -24,7 +24,7 @@ namespace CombatEssentials.Application.Services
             _env = env;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllAsync(int page, int? categoryId = null, string? name = null)
+        public async Task<PaginatedProductsDto> GetAllAsync(int page, int? categoryId = null, string? name = null)
         {
             const int pageSize = 15;
 
@@ -36,12 +36,15 @@ namespace CombatEssentials.Application.Services
             {
                 query = query.Where(p => p.CategoryId == categoryId.Value);
             }
+
             if (!string.IsNullOrWhiteSpace(name))
             {
                 query = query.Where(p => p.Name.ToLower().Contains(name.ToLower()));
             }
 
-            return await query
+            var totalItems = await query.CountAsync();
+
+            var products = await query
                 .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -56,7 +59,16 @@ namespace CombatEssentials.Application.Services
                     ImageUrl = p.ImageUrl
                 })
                 .ToListAsync();
+
+            return new PaginatedProductsDto
+            {
+                Products = products,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
         }
+
 
         public async Task<IEnumerable<ProductDto>> GetRandomProductsAsync(int count = 9)
         {

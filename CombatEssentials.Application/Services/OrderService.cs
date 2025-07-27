@@ -134,6 +134,7 @@ namespace CombatEssentials.Application.Services
                 {
                     ProductId = oi.ProductId,
                     ProductName = oi.Product?.Name ?? "",
+                    ProductImageUrl = oi.Product?.ImageUrl ?? "",
                     Quantity = oi.Quantity,
                     UnitPrice = oi.UnitPrice,
                     TotalAmount = oi.TotalAmount
