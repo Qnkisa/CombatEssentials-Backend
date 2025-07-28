@@ -14,7 +14,6 @@ namespace CombatEssentials.API.Areas.UserControllers
             _categoryService = categoryService;
         }
 
-        // GET: api/Category
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

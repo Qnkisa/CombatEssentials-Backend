@@ -11,14 +11,12 @@ namespace CombatEssentials.Domain.Entities
 {
     public class ApplicationUser : IdentityUser
     {
-        // Custom fields
         [Required, MaxLength(ApplicationUserValidations.FirstNameMaxLength)]
         public string FirstName { get; set; }
 
         [Required, MaxLength(ApplicationUserValidations.LastNameMaxLength)]
         public string LastName { get; set; }
 
-        // Navigation properties
         public ICollection<Wishlist> Wishlists { get; set; }
         public ICollection<ShoppingCart> ShoppingCarts { get; set; }
         public ICollection<Order> Orders { get; set; }

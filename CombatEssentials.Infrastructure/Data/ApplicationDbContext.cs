@@ -24,77 +24,66 @@ namespace CombatEssentials.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
-            // Category - Product (1:M)
             builder.Entity<Category>()
                 .HasMany(c => c.Products)
                 .WithOne(p => p.Category)
                 .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Product - Review (1:M)
             builder.Entity<Product>()
                 .HasMany(p => p.Reviews)
                 .WithOne(r => r.Product)
                 .HasForeignKey(r => r.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Product - CartItem (1:M)
             builder.Entity<Product>()
                 .HasMany(p => p.CartItems)
                 .WithOne(ci => ci.Product)
                 .HasForeignKey(ci => ci.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Product - OrderItem (1:M)
             builder.Entity<Product>()
                 .HasMany(p => p.OrderItems)
                 .WithOne(oi => oi.Product)
                 .HasForeignKey(oi => oi.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Product - Wishlist (1:M)
             builder.Entity<Product>()
                 .HasMany(p => p.Wishlists)
                 .WithOne(w => w.Product)
                 .HasForeignKey(w => w.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ApplicationUser - Review (1:M)
             builder.Entity<ApplicationUser>()
                 .HasMany(u => u.Reviews)
                 .WithOne(r => r.User)
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ApplicationUser - Wishlist (1:M)
             builder.Entity<ApplicationUser>()
                 .HasMany(u => u.Wishlists)
                 .WithOne(w => w.User)
                 .HasForeignKey(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ApplicationUser - ShoppingCart (1:M)
             builder.Entity<ApplicationUser>()
                 .HasMany(u => u.ShoppingCarts)
                 .WithOne(sc => sc.User)
                 .HasForeignKey(sc => sc.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ApplicationUser - Order (1:M)
             builder.Entity<ApplicationUser>()
                 .HasMany(u => u.Orders)
                 .WithOne(o => o.User)
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ShoppingCart - CartItem (1:M)
             builder.Entity<ShoppingCart>()
                 .HasMany(sc => sc.CartItems)
                 .WithOne(ci => ci.ShoppingCart)
                 .HasForeignKey(ci => ci.ShoppingCartId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Order - OrderItem (1:M)
             builder.Entity<Order>()
                 .HasMany(o => o.OrderItems)
                 .WithOne(oi => oi.Order)

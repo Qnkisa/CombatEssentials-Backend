@@ -32,7 +32,6 @@ namespace CombatEssentials.Domain.Entities
 
         public bool IsDeleted { get; set; } = false;
 
-        // Navigation
         [ForeignKey("CategoryId")]
         public Category Category { get; set; }
 

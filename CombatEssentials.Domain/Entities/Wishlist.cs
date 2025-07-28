@@ -20,7 +20,6 @@ namespace CombatEssentials.Domain.Entities
         [Required]
         public int ProductId { get; set; }
 
-        // Navigation
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 

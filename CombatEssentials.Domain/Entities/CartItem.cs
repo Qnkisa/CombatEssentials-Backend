@@ -24,7 +24,6 @@ namespace CombatEssentials.Domain.Entities
         [Required, Range(CartItemValidations.QuantityMinValue, CartItemValidations.QuantityMaxValue)]
         public int Quantity { get; set; }
 
-        // Navigation
         [ForeignKey("ShoppingCartId")]
         public ShoppingCart ShoppingCart { get; set; }
 

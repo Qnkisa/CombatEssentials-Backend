@@ -34,8 +34,7 @@ namespace CombatEssentials.Domain.Entities
 
         [Required, MaxLength(20)]
         public string PhoneNumber { get; set; }
-
-        // Navigation
+        
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 

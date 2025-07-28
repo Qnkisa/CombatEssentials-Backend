@@ -61,7 +61,6 @@ namespace CombatEssentials.API.Areas.UserControllers
             return Ok(new { message = result.Message });
         }
 
-        // PATCH: api/cart/update-quantity/{cartItemId}
         [HttpPatch("update-quantity/{cartItemId}")]
         public async Task<IActionResult> UpdateQuantity(int cartItemId, [FromBody] UpdateCartQuantityDto dto)
         {

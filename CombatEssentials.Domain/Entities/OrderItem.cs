@@ -28,7 +28,6 @@ namespace CombatEssentials.Domain.Entities
         [Required, Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
-        // Navigation
         [ForeignKey("OrderId")]
         public Order Order { get; set; }
 

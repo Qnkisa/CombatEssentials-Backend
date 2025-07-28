@@ -18,7 +18,6 @@ namespace CombatEssentials.Domain.Entities
         [Required]
         public string UserId { get; set; }
 
-        // Navigation
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 

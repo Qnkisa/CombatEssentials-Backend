@@ -22,7 +22,6 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            // Seed admin user
             var adminEmail = "admin@combat.com";
             var adminFirstName = "Admin";
             var adminLastName = "Adminov";
@@ -81,7 +80,7 @@ namespace CombatEssentials.Infrastructure.Data.Seed
             {
                 Name = "Pro Fight Gloves",
                 Description = "Durable leather gloves for professional sparring.",
-                ImageUrl = "/images/products/gloves1.jpg",
+                ImageUrl = "/uploads/gloves1.jpg",
                 Price = 89.99m,
                 CategoryId = glovesCategory.Id
             },
@@ -89,15 +88,15 @@ namespace CombatEssentials.Infrastructure.Data.Seed
             {
                 Name = "Headgear Elite",
                 Description = "Maximum protection headgear with breathable padding.",
-                ImageUrl = "/images/products/headgear1.jpg",
+                ImageUrl = "/uploads/headgear1.jpg",
                 Price = 74.50m,
                 CategoryId = headgearCategory.Id
             },
             new Product
             {
-                Name = "Combat Essentials Hoodie",
-                Description = "Comfortable hoodie for everyday wear and training.",
-                ImageUrl = "/images/products/apparel1.jpg",
+                Name = "Grappling Rashguard",
+                Description = "Comfortable Rashguard for training.",
+                ImageUrl = "/uploads/rashguard1.jpg",
                 Price = 49.90m,
                 CategoryId = apparelCategory.Id
             }
@@ -141,7 +140,7 @@ namespace CombatEssentials.Infrastructure.Data.Seed
         {
             if (!await context.ShoppingCarts.AnyAsync())
             {
-                var users = await context.Users.Take(5).ToListAsync();
+                var users = await context.Users.Take(3).ToListAsync();
                 var carts = users.Select(u => new ShoppingCart { UserId = u.Id }).ToList();
                 context.ShoppingCarts.AddRange(carts);
                 await context.SaveChangesAsync();
@@ -153,7 +152,7 @@ namespace CombatEssentials.Infrastructure.Data.Seed
             if (!await context.CartItems.AnyAsync())
             {
                 var carts = await context.ShoppingCarts.Include(sc => sc.CartItems).ToListAsync();
-                var products = await context.Products.Take(5).ToListAsync();
+                var products = await context.Products.Take(3).ToListAsync();
                 int quantity = 1;
                 var cartItems = new List<CartItem>();
                 foreach (var cart in carts)
@@ -167,9 +166,9 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                             Quantity = quantity
                         });
                         quantity = quantity % 5 + 1;
-                        if (cartItems.Count >= 5) break;
+                        if (cartItems.Count >= 3) break;
                     }
-                    if (cartItems.Count >= 5) break;
+                    if (cartItems.Count >= 3) break;
                 }
                 context.CartItems.AddRange(cartItems);
                 await context.SaveChangesAsync();
@@ -180,8 +179,8 @@ namespace CombatEssentials.Infrastructure.Data.Seed
         {
             if (!await context.Wishlists.AnyAsync())
             {
-                var users = await context.Users.Take(5).ToListAsync();
-                var products = await context.Products.Take(5).ToListAsync();
+                var users = await context.Users.Take(3).ToListAsync();
+                var products = await context.Products.Take(3).ToListAsync();
                 var wishlists = new List<Wishlist>();
                 foreach (var user in users)
                 {
@@ -192,9 +191,9 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                             UserId = user.Id,
                             ProductId = product.Id
                         });
-                        if (wishlists.Count >= 5) break;
+                        if (wishlists.Count >= 3) break;
                     }
-                    if (wishlists.Count >= 5) break;
+                    if (wishlists.Count >= 3) break;
                 }
                 context.Wishlists.AddRange(wishlists);
                 await context.SaveChangesAsync();
@@ -205,7 +204,7 @@ namespace CombatEssentials.Infrastructure.Data.Seed
         {
             if (!await context.Orders.AnyAsync())
             {
-                var users = await context.Users.Take(5).ToListAsync();
+                var users = await context.Users.Take(3).ToListAsync();
                 var orders = new List<Order>();
                 foreach (var user in users)
                 {
@@ -219,7 +218,7 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                         FullName = user.FirstName + " " + user.LastName,
                         PhoneNumber = "1234567890"
                     });
-                    if (orders.Count >= 5) break;
+                    if (orders.Count >= 3) break;
                 }
                 context.Orders.AddRange(orders);
                 await context.SaveChangesAsync();
@@ -231,7 +230,7 @@ namespace CombatEssentials.Infrastructure.Data.Seed
             if (!await context.OrderItems.AnyAsync())
             {
                 var orders = await context.Orders.Include(o => o.OrderItems).ToListAsync();
-                var products = await context.Products.Take(5).ToListAsync();
+                var products = await context.Products.Take(3).ToListAsync();
                 var orderItems = new List<OrderItem>();
                 foreach (var order in orders)
                 {
@@ -245,9 +244,9 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                             UnitPrice = product.Price,
                             TotalAmount = product.Price
                         });
-                        if (orderItems.Count >= 5) break;
+                        if (orderItems.Count >= 3) break;
                     }
-                    if (orderItems.Count >= 5) break;
+                    if (orderItems.Count >= 3) break;
                 }
                 context.OrderItems.AddRange(orderItems);
                 await context.SaveChangesAsync();
@@ -258,8 +257,8 @@ namespace CombatEssentials.Infrastructure.Data.Seed
         {
             if (!await context.Reviews.AnyAsync())
             {
-                var users = await context.Users.Take(5).ToListAsync();
-                var products = await context.Products.Take(5).ToListAsync();
+                var users = await context.Users.Take(3).ToListAsync();
+                var products = await context.Products.Take(3).ToListAsync();
                 var reviews = new List<Review>();
                 int rating = 5;
                 foreach (var user in users)
@@ -274,9 +273,9 @@ namespace CombatEssentials.Infrastructure.Data.Seed
                             Comment = $"Great product {product.Name}!"
                         });
                         rating = rating == 1 ? 5 : rating - 1;
-                        if (reviews.Count >= 5) break;
+                        if (reviews.Count >= 3) break;
                     }
-                    if (reviews.Count >= 5) break;
+                    if (reviews.Count >= 3) break;
                 }
                 context.Reviews.AddRange(reviews);
                 await context.SaveChangesAsync();

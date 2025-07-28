@@ -27,7 +27,6 @@ namespace CombatEssentials.Domain.Entities
         [MaxLength(ReviewValidations.CommentMaxLength)]
         public string Comment { get; set; }
 
-        // Navigation
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
 

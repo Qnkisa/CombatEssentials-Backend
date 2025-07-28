@@ -8,7 +8,7 @@ namespace CombatEssentials.API.Areas.UserControllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Requires authentication
+    [Authorize]
     public class ReviewController : ControllerBase
     {
         private readonly IReviewService _reviewService;
@@ -23,7 +23,6 @@ namespace CombatEssentials.API.Areas.UserControllers
             return User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
-        // GET: api/review/product/{productId}
         [HttpGet("product/{productId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetReviewsForProduct(int productId, [FromQuery] int page = 1)
@@ -32,7 +31,6 @@ namespace CombatEssentials.API.Areas.UserControllers
             return Ok(reviews);
         }
 
-        // GET: api/review/product/{productId}/average
         [HttpGet("product/{productId}/average")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAverageRatingForProduct(int productId)
@@ -41,7 +39,6 @@ namespace CombatEssentials.API.Areas.UserControllers
             return Ok(new { productId, averageRating = average });
         }
 
-        // POST: api/review
         [HttpPost]
         public async Task<IActionResult> AddReview([FromBody] ReviewDto dto)
         {
@@ -53,7 +50,6 @@ namespace CombatEssentials.API.Areas.UserControllers
             return Ok(new { message = "Review added successfully." });
         }
 
-        // DELETE: api/review/{reviewId}
         [HttpDelete("{reviewId}")]
         public async Task<IActionResult> DeleteReview(int reviewId)
         {

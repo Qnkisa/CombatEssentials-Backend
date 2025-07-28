@@ -107,7 +107,6 @@ namespace CombatEssentials.Application.Services
             return (true, "Order status updated successfully.");
         }
 
-        // Helper
         private OrderDto MapToDto(Order order)
         {
             return new OrderDto
