@@ -21,9 +21,12 @@ namespace CombatEssentials.Application.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<OrderDto>> GetAllAsync(int page)
+        public async Task<PaginatedOrderDto> GetAllAsync(int page)
         {
             const int pageSize = 15;
+
+            var totalOrders = await _context.Orders.CountAsync();
+
             var orders = await _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
@@ -32,12 +35,21 @@ namespace CombatEssentials.Application.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return orders.Select(MapToDto);
+            return new PaginatedOrderDto
+            {
+                TotalOrders = totalOrders,
+                Orders = orders.Select(MapToDto)
+            };
         }
 
-        public async Task<IEnumerable<OrderDto>> GetByUserIdAsync(string userId, int page)
+        public async Task<PaginatedOrderDto> GetByUserIdAsync(string userId, int page)
         {
             const int pageSize = 15;
+
+            var totalOrders = await _context.Orders
+                .Where(o => o.UserId == userId)
+                .CountAsync();
+
             var orders = await _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
@@ -47,7 +59,11 @@ namespace CombatEssentials.Application.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return orders.Select(MapToDto);
+            return new PaginatedOrderDto
+            {
+                TotalOrders = totalOrders,
+                Orders = orders.Select(MapToDto)
+            };
         }
 
         public async Task<OrderDto> CreateAsync(string? userId, CreateOrderDto dto)

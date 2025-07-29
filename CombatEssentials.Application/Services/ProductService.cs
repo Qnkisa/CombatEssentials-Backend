@@ -179,9 +179,10 @@ namespace CombatEssentials.Application.Services
             return (true, "Product deleted successfully.");
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllForAdminAsync(int page, int? categoryId = null, string? name = null)
+        public async Task<PaginatedProductsDto> GetAllForAdminAsync(int page, int? categoryId = null, string? name = null)
         {
             const int pageSize = 15;
+
             var query = _context.Products
                 .Include(p => p.Category)
                 .AsQueryable();
@@ -190,12 +191,15 @@ namespace CombatEssentials.Application.Services
             {
                 query = query.Where(p => p.CategoryId == categoryId.Value);
             }
+
             if (!string.IsNullOrWhiteSpace(name))
             {
                 query = query.Where(p => p.Name.ToLower().Contains(name.ToLower()));
             }
 
-            return await query
+            var totalItems = await query.CountAsync();
+
+            var products = await query
                 .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -211,7 +215,16 @@ namespace CombatEssentials.Application.Services
                     IsDeleted = p.IsDeleted
                 })
                 .ToListAsync();
+
+            return new PaginatedProductsDto
+            {
+                Products = products,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
         }
+
 
         public async Task<(bool Success, string Message)> UndeleteAsync(int id)
         {

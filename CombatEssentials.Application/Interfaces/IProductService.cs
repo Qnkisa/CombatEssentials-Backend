@@ -16,6 +16,6 @@ namespace CombatEssentials.Application.Interfaces
         Task<(bool Success, string Message)> UpdateAsync(int id, UpdateProductDto dto);
         Task<(bool Success, string Message)> DeleteAsync(int id);
         Task<(bool Success, string Message)> UndeleteAsync(int id);
-        Task<IEnumerable<ProductDto>> GetAllForAdminAsync(int page, int? categoryId = null, string? name = null);
+        Task<PaginatedProductsDto> GetAllForAdminAsync(int page, int? categoryId = null, string? name = null);
     }
 }

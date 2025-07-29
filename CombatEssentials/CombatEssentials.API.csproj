@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <Compile Remove="Areas\AdminControllers\Controllers\**" />
+    <Compile Remove="wwwroot\images\**" />
     <Content Remove="Areas\AdminControllers\Controllers\**" />
+    <Content Remove="wwwroot\images\**" />
     <EmbeddedResource Remove="Areas\AdminControllers\Controllers\**" />
+    <EmbeddedResource Remove="wwwroot\images\**" />
     <None Remove="Areas\AdminControllers\Controllers\**" />
+    <None Remove="wwwroot\images\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,10 +32,6 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\images\products\" />
   </ItemGroup>
 
   <ItemGroup>

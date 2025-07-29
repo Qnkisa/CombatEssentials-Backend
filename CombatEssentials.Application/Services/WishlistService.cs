@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CombatEssentials.Application.DTOs.ProductDtos;
+using CombatEssentials.Application.DTOs.WishlistDtos;
 using CombatEssentials.Application.Interfaces;
 using CombatEssentials.Domain.Entities;
 using CombatEssentials.Infrastructure.Data;
@@ -16,10 +17,15 @@ namespace CombatEssentials.Application.Services
         private readonly ApplicationDbContext _context;
         public WishlistService(ApplicationDbContext context) => _context = context;
 
-        public async Task<IEnumerable<ProductDto>> GetWishlistAsync(string userId, int page)
+        public async Task<PaginatedWishlistDto> GetWishlistAsync(string userId, int page)
         {
             const int pageSize = 15;
-            return await _context.Wishlists
+
+            var totalCount = await _context.Wishlists
+                .Where(w => w.UserId == userId)
+                .CountAsync();
+
+            var products = await _context.Wishlists
                 .Where(w => w.UserId == userId)
                 .Include(w => w.Product)
                     .ThenInclude(p => p.Category)
@@ -36,6 +42,12 @@ namespace CombatEssentials.Application.Services
                     CategoryName = w.Product.Category.Name
                 })
                 .ToListAsync();
+
+            return new PaginatedWishlistDto
+            {
+                TotalCount = totalCount,
+                Products = products
+            };
         }
 
         public async Task<(bool Success, string Message)> AddToWishlistAsync(string userId, int productId)
